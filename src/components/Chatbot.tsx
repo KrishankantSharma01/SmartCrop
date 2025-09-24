@@ -26,6 +26,9 @@ export function Chatbot({ onBack }: ChatbotProps) {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCmJmyPkhm3U_anvLBjcHXuk8ZbG_3GSYE";
 
   const quickQuestions = [
     { text: 'Best time to sow wheat?', hindi: 'गेहूं बोने का सबसे अच्छा समय?', lang: 'en' },
@@ -43,7 +46,7 @@ export function Chatbot({ onBack }: ChatbotProps) {
     'irrigation': 'Irrigate based on soil moisture and crop stage. Generally, water when soil moisture drops to 50-60% of field capacity. / मिट्टी की नमी और फसल की अवस्था के आधार पर सिंचाई करें।'
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
@@ -55,32 +58,52 @@ export function Chatbot({ onBack }: ChatbotProps) {
 
     setMessages(prev => [...prev, userMessage]);
 
-    // Simple bot response logic
-    setTimeout(() => {
-      let botResponse = "I understand your question. Let me help you with that. For detailed advice, please consult with our agricultural experts. / मैं आपका प्रश्न समझ गया हूँ। इसमें आपकी मदद करता हूँ।";
-      
-      const lowerInput = inputMessage.toLowerCase();
-      if (lowerInput.includes('wheat') || lowerInput.includes('गेहूं')) {
-        botResponse = botResponses.wheat;
-      } else if (lowerInput.includes('rice') || lowerInput.includes('धान') || lowerInput.includes('चावल')) {
-        botResponse = botResponses.rice;
-      } else if (lowerInput.includes('cotton') || lowerInput.includes('कपास')) {
-        botResponse = botResponses.cotton;
-      } else if (lowerInput.includes('irrigation') || lowerInput.includes('सिंचाई')) {
-        botResponse = botResponses.irrigation;
-      }
+    setIsLoading(true);
+    setInputMessage('');
+
+    try {
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: userMessage.text }
+              ]
+            }
+          ]
+        })
+      });
+
+      const data = await response.json();
+
+      const parts = data?.candidates?.[0]?.content?.parts;
+      const botText = Array.isArray(parts)
+        ? parts.map((p: { text?: string }) => p?.text ?? '').join('')
+        : 'Sorry, I could not generate a response.';
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: botResponse,
+        text: botText || 'Sorry, I could not generate a response.',
         sender: 'bot',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, botMessage]);
-    }, 1000);
-
-    setInputMessage('');
+    } catch (error) {
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'There was an error contacting the assistant. Please try again later.',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleQuickQuestion = (question: string) => {
