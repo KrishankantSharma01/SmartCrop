@@ -5,17 +5,21 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Mail, Lock, User } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 // import { useNavigate } from 'react-router-dom';
 
 export function LoginScreen() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: ''
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,8 +29,34 @@ export function LoginScreen() {
     }));
   };
 
-const handleSubmit = () => {
-  navigate('/dashboard');
+const handleSubmit = async () => {
+  try {
+    setError(null);
+    setLoading(true);
+    const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
+    const payload = isSignUp
+      ? { username: formData.username, email: formData.email, password: formData.password }
+      : { username: formData.username, password: formData.password };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.message || 'Authentication failed');
+    }
+    if (data?.token) {
+      login(data.token);
+    }
+    navigate('/dashboard');
+  } catch (e: any) {
+    setError(e.message || 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
 };  return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto p-6 space-y-6 shadow-lg">
@@ -96,8 +126,9 @@ const handleSubmit = () => {
           <Button 
             onClick={handleSubmit}
             className="w-full h-12 bg-primary hover:bg-primary/90"
+            disabled={loading}
           >
-            {isSignUp ? 'Sign Up / साइन अप करें' : 'Sign In / साइन इन करें'}
+            {loading ? 'Please wait...' : (isSignUp ? 'Sign Up / साइन अप करें' : 'Sign In / साइन इन करें')}
           </Button>
 
           <Button 
@@ -108,6 +139,12 @@ const handleSubmit = () => {
             {isSignUp ? 'Already have an account? Sign In' : 'New user? Create Account'}
           </Button>
         </div>
+
+        {error && (
+          <div className="text-center pt-2">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Info */}
         <div className="text-center pt-4">

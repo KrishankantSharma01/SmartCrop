@@ -9,6 +9,7 @@ import { Chatbot } from "./components/Chatbot";
 import { Community } from "./components/Community";
 import { CropDisease } from "./components/CropDisease";
 import { LanguageProvider } from "./components/LanguageContext";
+import { AuthProvider } from "./components/AuthContext";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -35,10 +36,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </LanguageProvider>
+    </AuthProvider>
   );
 }
