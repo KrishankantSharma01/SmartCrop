@@ -6,9 +6,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smartcrop';
-const PORT = process.env.PORT || 5000;
-const ORIGIN = process.env.ORIGIN || 'http://localhost:3000';
+const MONGO_URI = process.env.MONGO_URI;
+const PORT = process.env.PORT;
+const ORIGIN = process.env.ORIGIN;
 
 async function start() {
   await mongoose.connect(MONGO_URI);
