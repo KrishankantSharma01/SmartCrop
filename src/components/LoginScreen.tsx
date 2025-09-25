@@ -4,8 +4,8 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Mail, Lock, User } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 // import { useNavigate } from 'react-router-dom';
 
@@ -14,50 +14,57 @@ export function LoginScreen() {
   const { login } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
+    username: "",
+    email: "",
+    password: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-const handleSubmit = async () => {
-  try {
-    setError(null);
-    setLoading(true);
-    const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
-    const payload = isSignUp
-      ? { username: formData.username, email: formData.email, password: formData.password }
-      : { username: formData.username, password: formData.password };
+  const handleSubmit = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const endpoint = isSignUp
+        ? "http://localhost:5000/api/auth/signup"
+        : "http://localhost:5000/api/auth/login";
+      const payload = isSignUp
+        ? {
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          }
+        : { username: formData.username, password: formData.password };
 
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data?.message || 'Authentication failed');
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || "Authentication failed");
+      }
+      if (data?.token) {
+        login(data.token);
+      }
+      navigate("/dashboard");
+    } catch (e: any) {
+      setError(e.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    if (data?.token) {
-      login(data.token);
-    }
-    navigate('/dashboard');
-  } catch (e: any) {
-    setError(e.message || 'Something went wrong');
-  } finally {
-    setLoading(false);
-  }
-};  return (
+  };
+  return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto p-6 space-y-6 shadow-lg">
         {/* Header */}
@@ -66,10 +73,12 @@ const handleSubmit = async () => {
             <User className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-primary">
-            {isSignUp ? 'Create Account / खाता बनाएं' : 'Welcome Back / वापस स्वागत'}
+            {isSignUp
+              ? "Create Account / खाता बनाएं"
+              : "Welcome Back / वापस स्वागत"}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {isSignUp ? 'Sign up to get started' : 'Sign in to continue'}
+            {isSignUp ? "Sign up to get started" : "Sign in to continue"}
           </p>
         </div>
 
@@ -123,20 +132,26 @@ const handleSubmit = async () => {
             </div>
           </div>
 
-          <Button 
+          <Button
             onClick={handleSubmit}
             className="w-full h-12 bg-primary hover:bg-primary/90"
             disabled={loading}
           >
-            {loading ? 'Please wait...' : (isSignUp ? 'Sign Up / साइन अप करें' : 'Sign In / साइन इन करें')}
+            {loading
+              ? "Please wait..."
+              : isSignUp
+              ? "Sign Up / साइन अप करें"
+              : "Sign In / साइन इन करें"}
           </Button>
 
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => setIsSignUp(!isSignUp)}
             className="w-full"
           >
-            {isSignUp ? 'Already have an account? Sign In' : 'New user? Create Account'}
+            {isSignUp
+              ? "Already have an account? Sign In"
+              : "New user? Create Account"}
           </Button>
         </div>
 
