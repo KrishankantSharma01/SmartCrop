@@ -7,10 +7,10 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
 require("dotenv").config();
 
-const MONGO_URI = process.env.MONGO_URI;
-const PORT = process.env.PORT;
-// Temporarily hardcode ORIGIN to fix CORS for frontend on port 3000
-const ORIGIN = "http://localhost:3000";
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smartcrop';
+const PORT = process.env.PORT || 5000;
+const ORIGIN = process.env.ORIGIN || 'http://localhost:3000';
+
 
 async function start() {
   await mongoose.connect(MONGO_URI);
