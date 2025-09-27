@@ -8,6 +8,7 @@ import { MarketPrices } from "./components/MarketPrices";
 import { Chatbot } from "./components/Chatbot";
 import { Community } from "./components/Community";
 import { CropDisease } from "./components/CropDisease";
+import { VoiceAgent } from "./components/VoiceAgent";
 import { LanguageProvider } from "./components/LanguageContext";
 import { AuthProvider } from "./components/AuthContext";
 
@@ -25,6 +26,7 @@ function AppContent() {
       <Route path="/soil-report" element={<SoilReport onBack={handleBack} />} />
       <Route path="/market-prices" element={<MarketPrices onBack={handleBack} />} />
       <Route path="/chatbot" element={<Chatbot onBack={handleBack} />} />
+      <Route path="/voice-agent" element={<VoiceAgent onBack={handleBack} />} />
       <Route path="/community" element={<Community onBack={handleBack} />} />
       <Route path="/crop-disease" element={<CropDisease onBack={handleBack} />} />
       

@@ -63,12 +63,12 @@ export function Dashboard() {
       description: 'Latest mandi rates'
     },
     {
-      id: 'chatbot',
-      title: 'Voice Assistant',
-      titleHindi: 'आवाज़ सहायक',
+      id: 'voice-agent',
+      title: 'LiveKit Voice Agent',
+      titleHindi: 'लाइव आवाज़ सहायक',
       icon: Mic,
       color: 'bg-green-600',
-      description: 'Speak in your language',
+      description: 'Real-time voice AI',
       isVoiceAgent: true
     },
     {
@@ -166,11 +166,11 @@ export function Dashboard() {
             </div>
             <Button 
               variant="secondary" 
-              onClick={() => navigate('/chatbot')}
+              onClick={() => navigate('/voice-agent')}
               className="mt-4 bg-white text-green-700 hover:bg-white/90"
             >
               <Mic className="w-4 h-4 mr-2" />
-              Try Voice Assistant / आवाज़ सहायक आज़माएं
+              Try LiveKit Voice Agent / लाइव आवाज़ सहायक आज़माएं
             </Button>
           </div>
         </Card>
@@ -264,7 +264,7 @@ export function Dashboard() {
       </div>
 
       {/* Floating Voice Assistant Button */}
-      <FloatingVoiceButton onVoiceAssistant={() => navigate('/chatbot')} />
+      <FloatingVoiceButton onVoiceAssistant={() => navigate('/voice-agent')} />
     </div>
   );
 }
